@@ -1,0 +1,9 @@
+.git
+.gitignore
+.idea
+**/node_modules
+**/dist
+**/target
+**/.angular
+*.zip
+frontend/preview.*

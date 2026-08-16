@@ -2,6 +2,8 @@
 
 Mesa de ayuda TI para registrar, priorizar y seguir incidentes técnicos. El proyecto representa un flujo de soporte de nivel 1 y está pensado como demostración de portafolio full stack.
 
+[Ver demo en vivo](https://pietroalvarez-supportdesk-demo.onrender.com)
+
 ![Panel principal de SupportDesk](docs/dashboard.jpg)
 
 ## Funcionalidades
@@ -87,6 +89,12 @@ mvn test
 ```
 
 El frontend también se valida con el compilador estricto de Angular y TypeScript.
+
+## Despliegue
+
+El `Dockerfile` compila Angular, lo integra dentro de Spring Boot y genera un único servicio web. `render.yaml` permite desplegarlo en Render y volver a publicarlo automáticamente con cada cambio en `main`.
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/PietroAlvarez/SupportDesk)
 
 ## Autor
 
