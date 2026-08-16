@@ -1,0 +1,94 @@
+<header class="hero">
+  <nav class="nav shell" aria-label="Navegación principal">
+    <a class="brand" href="#inicio" aria-label="SupportDesk inicio"><span>SD</span> SupportDesk</a>
+    <span class="project-chip">Proyecto de portafolio</span>
+  </nav>
+
+  <section class="hero-content shell" id="inicio">
+    <div>
+      <p class="eyebrow">MESA DE AYUDA TI</p>
+      <h1>Soporte claro.<br><em>Problemas resueltos.</em></h1>
+      <p class="hero-copy">Organiza solicitudes técnicas, prioriza incidentes y mantén visible el avance de cada ticket.</p>
+      <a class="hero-action" href="#tickets">Ver tickets <span>↓</span></a>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div>
+      <div class="terminal-card">
+        <div class="terminal-top"><span></span><span></span><span></span></div>
+        <p>INCIDENTE #104</p><strong>RED · PRIORIDAD ALTA</strong>
+        <div class="progress"><i></i></div><small>Técnico asignado</small>
+      </div>
+    </div>
+  </section>
+</header>
+
+<main class="shell">
+  <section class="stats" aria-label="Resumen de tickets">
+    <article><span>Total</span><strong>{{ dashboard().total }}</strong><small>tickets registrados</small></article>
+    <article><span>Abiertos</span><strong>{{ dashboard().open }}</strong><small>requieren atención</small></article>
+    <article><span>En curso</span><strong>{{ dashboard().inProgress }}</strong><small>siendo atendidos</small></article>
+    <article class="critical"><span>Críticos</span><strong>{{ dashboard().critical }}</strong><small>sin resolver</small></article>
+  </section>
+
+  @if (message()) { <button class="notice" type="button" (click)="message.set('')">{{ message() }} ×</button> }
+
+  <section class="workspace" id="tickets">
+    <div class="ticket-panel">
+      <div class="section-heading">
+        <div><p class="eyebrow dark">BANDEJA DE SOPORTE</p><h2>Tickets recientes</h2></div>
+        <span>{{ tickets().length }} resultados</span>
+      </div>
+
+      <div class="filters">
+        <label class="search"><span>⌕</span><input [(ngModel)]="search" (keyup.enter)="refresh()" placeholder="Buscar por ticket, persona o ubicación"></label>
+        <select [(ngModel)]="statusFilter" (change)="refresh()">
+          <option value="">Todos los estados</option><option value="OPEN">Abiertos</option>
+          <option value="IN_PROGRESS">En curso</option><option value="RESOLVED">Resueltos</option>
+        </select>
+        <button type="button" class="filter-button" (click)="refresh()">Buscar</button>
+      </div>
+
+      <div class="ticket-list">
+        @if (loading()) { <p class="empty">Cargando tickets…</p> }
+        @for (ticket of tickets(); track ticket.id) {
+          <article class="ticket-card">
+            <div class="ticket-main">
+              <div class="ticket-meta">
+                <span class="priority" [class]="'priority ' + ticket.priority.toLowerCase()">{{ priorityLabel(ticket.priority) }}</span>
+                <span>{{ categoryLabel(ticket.category) }}</span><span>·</span><span>#{{ ticket.id }}</span>
+              </div>
+              <h3>{{ ticket.title }}</h3>
+              <p>{{ ticket.description || 'Sin descripción adicional.' }}</p>
+              <div class="requester"><strong>{{ ticket.requester }}</strong><span>{{ ticket.location }}</span></div>
+            </div>
+            <div class="ticket-actions">
+              <span class="status" [class]="'status ' + ticket.status.toLowerCase()">{{ statusLabel(ticket.status) }}</span>
+              @if (ticket.status !== 'RESOLVED') { <button type="button" (click)="advance(ticket)">{{ nextLabel(ticket.status) }}</button> }
+              @if (ticket.status === 'RESOLVED') { <button type="button" class="ghost" (click)="remove(ticket)">Eliminar</button> }
+            </div>
+          </article>
+        } @empty { @if (!loading()) { <p class="empty">No encontramos tickets con esos filtros.</p> } }
+      </div>
+    </div>
+
+    <aside class="form-panel">
+      <p class="eyebrow dark">NUEVA SOLICITUD</p><h2>Crear ticket</h2>
+      <p class="form-intro">Registra un problema técnico y asígnale una prioridad inicial.</p>
+      <form (ngSubmit)="createTicket()">
+        <label>Título<input name="title" [(ngModel)]="form.title" placeholder="Ej. Equipo sin conexión" required maxlength="120"></label>
+        <div class="form-row">
+          <label>Solicitante<input name="requester" [(ngModel)]="form.requester" placeholder="Nombre ficticio" required></label>
+          <label>Ubicación<input name="location" [(ngModel)]="form.location" placeholder="Sala u oficina" required></label>
+        </div>
+        <div class="form-row">
+          <label>Categoría<select name="category" [(ngModel)]="form.category">@for (category of categories; track category) { <option [value]="category">{{ categoryLabel(category) }}</option> }</select></label>
+          <label>Prioridad<select name="priority" [(ngModel)]="form.priority">@for (priority of priorities; track priority) { <option [value]="priority">{{ priorityLabel(priority) }}</option> }</select></label>
+        </div>
+        <label>Descripción<textarea name="description" [(ngModel)]="form.description" placeholder="Describe brevemente el problema" rows="4" maxlength="500"></textarea></label>
+        <button class="submit" type="submit" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Crear ticket' }}</button>
+      </form>
+    </aside>
+  </section>
+</main>
+
+<footer><div class="shell"><span class="brand"><span>SD</span> SupportDesk</span><p>Java · Spring Boot · Angular · PostgreSQL</p></div></footer>
